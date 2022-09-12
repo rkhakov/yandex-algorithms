@@ -27,8 +27,10 @@ class Node:
         self.left = left
         self.value = value
 
+
 def remove(root, key):
-    if root is None: return root
+    if root is None:
+        return root
 
     if key < root.value:
         root.left = remove(root.left, key)
@@ -41,17 +43,14 @@ def remove(root, key):
         return None
     
     if root.left is None:
-        temp = root.right
-        root = None
-        return temp
+        return root.right
+
     if root.right is None:
-        temp = root.left
-        root = None
-        return temp
+        return root.left
     
     parent = root
     current = root.right
-    while current.left != None:
+    while current.left is not None:
         parent, current = current, current.left
     
     if parent != root:
@@ -61,6 +60,7 @@ def remove(root, key):
     
     root.value = current.value
     return root
+
 
 def test():
     node1 = Node(None, None, 2)

@@ -28,14 +28,20 @@ from typing import NamedTuple, List, Any, TypeVar
 
 T = TypeVar("T")
 
+
 def __siftdown(data: List[Any], start: int, end: int):
     root = start
     while True:
         child = root * 2 + 1
-        if child > end: break
+        if child > end:
+            break
+
         if child + 1 <= end and data[child] < data[child + 1]:
             child += 1
-        if data[root] > data[child]: break
+
+        if data[root] > data[child]:
+            break
+
         data[root], data[child] = data[child], data[root]
         root = child
 
