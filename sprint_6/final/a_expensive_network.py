@@ -22,9 +22,7 @@ ID: 72934725
     O(m * log n) - проход по ребрам и добавление вершны с весом в приоритетную очередь
 
 ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ:
-    O(n) - количество вершин в куче
-    O(n*m) - матрица смежности для неориентированного графа
-    Итоговую сложность можно выразить как O(n * m)
+    O(n^2) - матрица смежности для неориентированного графа
 """
 import heapq
 from typing import List, Tuple
@@ -49,6 +47,16 @@ class Graph:
         return self.__size
 
 
+def __add_edges_to_heap(
+    edges: List[Tuple[int, int]],
+    edges_heap: List[Tuple[int, int]],
+    visited_vertex: List[bool]
+):
+    for edge, weight in edges:
+        if not visited_vertex[edge]:
+            heapq.heappush(edges_heap, (-weight, edge))
+
+
 def find_mst(graph: Graph) -> int:
     visited_vertex = [False] * len(graph)
     visited_vertex[0] = True
@@ -56,18 +64,13 @@ def find_mst(graph: Graph) -> int:
     edges_heap = []
     max_spanning_tree = 0
 
-    def __add_vertex_to_heap(vertex, edges):
-        visited_vertex[vertex] = True
-        for edge, weight in edges:
-            if not visited_vertex[edge]:
-                heapq.heappush(edges_heap, (-weight, edge))
-
-    __add_vertex_to_heap(1, graph[1])
+    __add_edges_to_heap(graph[1], edges_heap, visited_vertex)
     while not all(visited_vertex) and edges_heap:
         weight, vertex = heapq.heappop(edges_heap)
         if not visited_vertex[vertex]:
             max_spanning_tree += abs(weight)
-            __add_vertex_to_heap(vertex, graph[vertex])
+            visited_vertex[vertex] = True
+            __add_edges_to_heap(graph[1], edges_heap, visited_vertex)
 
     if not all(visited_vertex):
         raise ValueError("Oops! I did it again")

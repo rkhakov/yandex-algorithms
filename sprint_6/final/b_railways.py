@@ -12,12 +12,12 @@ ID: 72924923
     это будет означать что в графе есть цикл
 
 ВРЕМЕННАЯ СЛОЖНОСТЬ:
-    V - количество вершин
-    E - количество ребер
-    O(V+E) - используется список смежности, перебираем ребра для каждой вершины
+    V - Количество городов
+    E - количество дорог
+    O(V+E) - используется список смежности, перебираем дороги для каждого города
 
 ПРОСТРАНСТВЕННАЯ СЛОЖНОСТЬ:
-    O(V*E) - храним список смежности, а также массив вершин с состояниями и стек ребер
+    O(V+E) - храним список смежности
 """
 
 from collections import defaultdict
@@ -40,33 +40,29 @@ class Graph:
     def __len__(self) -> int:
         return len(self.__graph)
 
-    def is_cyclic(self) -> bool:
-        states: List[int] = [DFSState.NOT_VISITED] * (len(self.__graph) + 1)
+    def __dfs(self, start: int, states: List[int]) -> bool:
+        stack = [start]
 
-        def __dfs(start: int) -> bool:
-            stack = [start]
+        while stack:
+            vertex = stack.pop()
+            if states[vertex] == DFSState.NOT_VISITED:
+                states[vertex] = DFSState.VISITED
+                stack.append(vertex)
 
-            while stack:
-                vertex = stack.pop()
-                if states[vertex] == DFSState.NOT_VISITED:
-                    states[vertex] = DFSState.VISITED
-                    stack.append(vertex)
+                for vertex_ in self.__graph[vertex]:
+                    if states[vertex_] == DFSState.NOT_VISITED:
+                        stack.append(vertex_)
+                    elif states[vertex_] == DFSState.VISITED:
+                        return True
 
-                    for vertex_ in self.__graph[vertex]:
-                        if states[vertex_] == DFSState.NOT_VISITED:
-                            stack.append(vertex_)
-                        elif states[vertex_] == DFSState.VISITED:
-                            return True
+            elif states[vertex] == DFSState.VISITED:
+                states[vertex] = DFSState.ENDED
 
-                elif states[vertex] == DFSState.VISITED:
-                    states[vertex] = DFSState.ENDED
-
-            return False
-
-        for i in range(len(self)):
-            if __dfs(i):
-                return True
         return False
+
+    def is_cyclic(self) -> bool:
+        states: List[int] = [DFSState.NOT_VISITED] * (len(self) + 1)
+        return any(self.__dfs(i, states) for i in range(len(self)))
 
 
 def main():
